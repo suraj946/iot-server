@@ -20,8 +20,20 @@ const addSchedule = asyncHandler(async(req, res) => {
 });
 
 const getSchedule = asyncHandler(async(req, res) => {
-    const data = await Schedule.findOne().sort({_id:-1})
-    const toSent = data.schedule.map(m => `${m.hours}:${m.minutes}:00`);
+    const data = await Schedule.findOne().sort({_id:-1});
+    const toSent = [];
+
+    data.schedule?.forEach(d => {
+        if((d.minutes < 10) && (d.hours < 10)){
+            toSent.push(`0${d.hours}:0${d.minutes}:00`);
+        }else if((d.minutes < 10) && (d.hours >= 10)){
+            toSent.push(`${d.hours}:0${d.minutes}:00`);
+        }else if((d.minutes >= 10) && (d.hours < 10)){
+            toSent.push(`0${d.hours}:${d.minutes}:00`);
+        }else{
+            toSent.push(`${d.hours}:${d.minutes}:00`);
+        }
+    });
     res.status(200).json({
         success:true,
         schedule:toSent
